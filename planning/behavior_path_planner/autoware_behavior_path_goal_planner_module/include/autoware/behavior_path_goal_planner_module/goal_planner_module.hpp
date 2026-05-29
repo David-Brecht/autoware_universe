@@ -308,7 +308,7 @@ private:
 
   // pre-generate lane parking paths in a separate thread
   rclcpp::TimerBase::SharedPtr lane_parking_timer_;
-  rclcpp::CallbackGroup::SharedPtr lane_parking_timer_cb_group_;
+  static rclcpp::CallbackGroup::SharedPtr lane_parking_timer_cb_group_;
   std::atomic<bool> is_lane_parking_cb_running_;
   // NOTE: never access to following variables except in updateData()!!!
   std::mutex lane_parking_mutex_;
@@ -316,7 +316,7 @@ private:
   LaneParkingResponse lane_parking_response_;
   // generate freespace parking paths in a separate thread
   rclcpp::TimerBase::SharedPtr freespace_parking_timer_;
-  rclcpp::CallbackGroup::SharedPtr freespace_parking_timer_cb_group_;
+  static rclcpp::CallbackGroup::SharedPtr freespace_parking_timer_cb_group_;
   std::atomic<bool> is_freespace_parking_cb_running_;
   std::mutex freespace_parking_mutex_;
   std::optional<FreespaceParkingRequest> freespace_parking_request_;

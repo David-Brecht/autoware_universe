@@ -111,8 +111,10 @@ GoalPlannerModule::GoalPlannerModule(
 
   // timer callback for generating lane parking candidate paths
   const auto lane_parking_period_ns = rclcpp::Rate(1.0).period();
-  lane_parking_timer_cb_group_ =
-    node.create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+  if (!lane_parking_timer_cb_group_) {
+    lane_parking_timer_cb_group_ = node.create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+  }
+
   lane_parking_timer_ = rclcpp::create_timer(
     &node, clock_, lane_parking_period_ns,
     [lane_parking_executor = std::make_unique<LaneParkingPlanner>(
@@ -126,8 +128,10 @@ GoalPlannerModule::GoalPlannerModule(
   if (parameters_.enable_freespace_parking) {
     auto freespace_planner = std::make_shared<FreespacePullOver>(node, *parameters);
     const auto freespace_parking_period_ns = rclcpp::Rate(1.0).period();
-    freespace_parking_timer_cb_group_ =
-      node.create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    if (!freespace_parking_timer_cb_group_) {
+      freespace_parking_timer_cb_group_ =
+        node.create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    }
     freespace_parking_timer_ = rclcpp::create_timer(
       &node, clock_, freespace_parking_period_ns,
       [freespace_parking_executor = std::make_unique<FreespaceParkingPlanner>(
@@ -138,6 +142,9 @@ GoalPlannerModule::GoalPlannerModule(
       freespace_parking_timer_cb_group_);
   }
 }
+
+rclcpp::CallbackGroup::SharedPtr GoalPlannerModule::lane_parking_timer_cb_group_       = nullptr;
+rclcpp::CallbackGroup::SharedPtr GoalPlannerModule::freespace_parking_timer_cb_group_ = nullptr;
 
 bool needPathUpdate(
   const Pose & current_pose, const double path_update_duration, const rclcpp::Time & now,
