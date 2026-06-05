@@ -102,6 +102,11 @@
           "default": 1.0,
           "description": "Expand object's rectangle with this value."
         },
+        "expand_lanelet_size": {
+          "type": "number",
+          "default": 0.5,
+          "description": "Expand lanelets boundaries with this value (positive values outwards, negative values inwards)."
+        },
         "size_of_expansion_kernel": {
           "type": "integer",
           "default": 9,
@@ -128,6 +133,7 @@
         "use_objects",
         "use_points",
         "expand_polygon_size",
+        "expand_lanelet_size",
         "size_of_expansion_kernel"
       ]
     }

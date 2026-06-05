@@ -171,9 +171,9 @@ void CostmapGenerator::loadRoadAreasFromLaneletMap(
 
     if (std::abs(expand_lanelet_size) >= 1e-6) {
       const auto ll_expanded_opt = autoware::experimental::lanelet2_utils::get_dirty_expanded_lanelet(
-        ll, expand_lanelet_size, -expand_lanelet_size); 
+        ll, expand_lanelet_size, -expand_lanelet_size);
       if (!ll_expanded_opt) {
-        RCLCPP_WARN_STREAM(rclcpp::get_logger("costmap_generator"), 
+        RCLCPP_WARN_STREAM(rclcpp::get_logger("costmap_generator"),
           "Failed to expand lanelet id=" << ll.id() << ". Using original lanelet.");
       } else {
         ll_to_use = *ll_expanded_opt;

@@ -56,7 +56,7 @@ costmap_generator_node:
   expand_polygon_size:
     type: double
     description: Expand object's rectangle with this value
-  expand_lanelet_size: 
+  expand_lanelet_size:
     type: double
     description: Expand lanelets boundaries with this value (positive values outwards, negative values inwards)
   size_of_expansion_kernel:
