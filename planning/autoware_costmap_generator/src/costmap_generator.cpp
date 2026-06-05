@@ -47,6 +47,7 @@
 #include "autoware/costmap_generator/utils/object_map_utils.hpp"
 
 #include <autoware/lanelet2_utils/conversion.hpp>
+#include <autoware/lanelet2_utils/geometry.hpp>
 #include <autoware_lanelet2_extension/utility/query.hpp>
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <autoware_lanelet2_extension/visualization/visualization.hpp>
@@ -157,7 +158,8 @@ CostmapGenerator::CostmapGenerator(const rclcpp::NodeOptions & node_options)
 
 void CostmapGenerator::loadRoadAreasFromLaneletMap(
   const lanelet::LaneletMapPtr lanelet_map,
-  std::vector<geometry_msgs::msg::Polygon> & area_polygons)
+  std::vector<geometry_msgs::msg::Polygon> & area_polygons,
+  double expand_lanelet_size)
 {
   // use all lanelets in map of subtype road to give way area
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map);
@@ -165,8 +167,21 @@ void CostmapGenerator::loadRoadAreasFromLaneletMap(
 
   // convert lanelets to polygons and put into area_points array
   for (const auto & ll : road_lanelets) {
+    lanelet::ConstLanelet ll_to_use = ll;
+
+    if (std::abs(expand_lanelet_size) >= 1e-6) {
+      const auto ll_expanded_opt = autoware::experimental::lanelet2_utils::get_dirty_expanded_lanelet(
+        ll, expand_lanelet_size, -expand_lanelet_size); 
+      if (!ll_expanded_opt) {
+        RCLCPP_WARN_STREAM(rclcpp::get_logger("costmap_generator"), 
+          "Failed to expand lanelet id=" << ll.id() << ". Using original lanelet.");
+      } else {
+        ll_to_use = *ll_expanded_opt;
+      }
+    }
+
     geometry_msgs::msg::Polygon poly;
-    for (const auto & p : ll.polygon3d().basicPolygon()) {
+    for (const auto & p : ll_to_use.polygon3d().basicPolygon()) {
       const auto pt = experimental::lanelet2_utils::to_ros(p);
       poly.points.push_back(
         geometry_msgs::build<geometry_msgs::msg::Point32>().x(pt.x).y(pt.y).z(pt.z));
@@ -220,7 +235,7 @@ void CostmapGenerator::onLaneletMapBin(
     autoware::experimental::lanelet2_utils::from_autoware_map_msgs(*msg));
 
   if (param_->use_wayarea) {
-    loadRoadAreasFromLaneletMap(lanelet_map_, primitives_polygons_);
+    loadRoadAreasFromLaneletMap(lanelet_map_, primitives_polygons_, param_->expand_lanelet_size);
   }
 
   if (param_->use_parkinglot) {

@@ -19,4 +19,5 @@
     use_objects: true
     use_points: true
     expand_polygon_size: 0.5
+    expand_lanelet_size: 0.5  # [m] positive values outwards, negative values inwards
     size_of_expansion_kernel: 9

@@ -47,7 +47,7 @@
 
 #include "autoware/costmap_generator/utils/objects_to_costmap.hpp"
 #include "autoware/costmap_generator/utils/points_to_costmap.hpp"
-#include "costmap_generator_node_parameters.hpp"
+#include <autoware_costmap_generator/costmap_generator_node_parameters.hpp>
 
 #include <autoware_utils/ros/polling_subscriber.hpp>
 #include <autoware_utils/ros/processing_time_publisher.hpp>
@@ -165,7 +165,8 @@ private:
   /// \param [out] area_polygons polygon vector to fill
   static void loadRoadAreasFromLaneletMap(
     const lanelet::LaneletMapPtr lanelet_map,
-    std::vector<geometry_msgs::msg::Polygon> & area_polygons);
+    std::vector<geometry_msgs::msg::Polygon> & area_polygons,
+    double expand_lanelet_size = 0.0);
 
   /// \brief fill a vector with parking-area polygons
   /// \param [in] lanelet_map input lanelet map
